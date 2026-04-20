@@ -1,0 +1,18 @@
+{{{
+  exports({ to: app.configPath('fine_images.ts') })
+}}}
+import env from '#start/env'
+import { defineConfig } from '@1001-digital/fine-images'
+
+export default defineConfig({
+  // Drive disk to store variants in. Omit to use the app default.
+  // disk: 'r2',
+
+  // Optional Cloudflare CDN purge config. When any field is missing, purge
+  // becomes a no-op — safe in dev.
+  cdnUrl: env.get('R2_CDN_URL'),
+  cloudflare: {
+    zoneId: env.get('CF_ZONE_ID'),
+    apiToken: env.get('CF_API_TOKEN'),
+  },
+})

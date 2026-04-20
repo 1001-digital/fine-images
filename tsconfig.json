@@ -1,0 +1,19 @@
+{
+  "extends": "@adonisjs/tsconfig/tsconfig.package.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./build",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  },
+  "include": [
+    "index.ts",
+    "configure.ts",
+    "providers/**/*.ts",
+    "services/**/*.ts",
+    "src/**/*.ts",
+    "stubs/main.ts"
+  ],
+  "exclude": ["build", "node_modules", "**/*.stub"]
+}

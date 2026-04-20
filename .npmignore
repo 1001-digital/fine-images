@@ -1,0 +1,14 @@
+node_modules
+src
+services
+providers
+stubs
+index.ts
+configure.ts
+tsconfig.json
+*.log
+.env
+.env.local
+.github
+tests
+.editorconfig

@@ -15,6 +15,7 @@ node ace migration:run
 ```
 
 The `configure` step:
+
 - registers the provider in `adonisrc.ts`
 - creates `config/fine_images.ts`
 - publishes a migration for the `image_caches` table into `database/migrations/`

@@ -52,6 +52,7 @@
     "postcompile": "pnpm copy:templates",
     "build": "pnpm compile",
     "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
     "changeset": "changeset",
     "prepublishOnly": "pnpm build"
   },
@@ -80,6 +81,7 @@
     "copyfiles": "^2.4.1",
     "del-cli": "^7.0.0",
     "luxon": "^3.7.0",
+    "prettier": "^3.0.0",
     "sharp": "^0.34.0",
     "typescript": "~5.9.0"
   }

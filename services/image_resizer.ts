@@ -1,5 +1,10 @@
 import sharp from 'sharp'
-import { ALL_SIZES, IMAGE_WIDTHS, type ImageSize, type ResizedImage } from '../src/types.js'
+import {
+  ALL_SIZES,
+  IMAGE_WIDTHS,
+  type ImageSize,
+  type ResizedImage,
+} from '../src/types.js'
 
 export { ALL_SIZES, IMAGE_WIDTHS }
 export type { ImageSize, ResizedImage }
@@ -18,11 +23,16 @@ const MAX_RASTER_PIXELS = 4096 * 4096
  * width, capped at {@link MAX_RASTER_PIXELS} so a pathological viewBox
  * doesn't blow up memory.
  */
-export async function resizeImage(input: Buffer | Uint8Array): Promise<ResizedImage[]> {
+export async function resizeImage(
+  input: Buffer | Uint8Array,
+): Promise<ResizedImage[]> {
   let image = sharp(input)
   let metadata = await image.metadata()
 
-  if (metadata.format === 'svg' && (!metadata.width || metadata.width < MAX_OUTPUT_WIDTH)) {
+  if (
+    metadata.format === 'svg' &&
+    (!metadata.width || metadata.width < MAX_OUTPUT_WIDTH)
+  ) {
     const w = metadata.width || DEFAULT_SVG_INTRINSIC_WIDTH
     const h = metadata.height || w
     const baseDpi = metadata.density || DEFAULT_SVG_DPI
@@ -42,7 +52,10 @@ export async function resizeImage(input: Buffer | Uint8Array): Promise<ResizedIm
   const sourceWidth = metadata.width || 0
   const results: ResizedImage[] = []
 
-  for (const [size, width] of Object.entries(IMAGE_WIDTHS) as [ImageSize, number][]) {
+  for (const [size, width] of Object.entries(IMAGE_WIDTHS) as [
+    ImageSize,
+    number,
+  ][]) {
     if (sourceWidth > width) {
       results.push({
         size,

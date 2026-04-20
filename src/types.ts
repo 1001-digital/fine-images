@@ -16,9 +16,6 @@ export const ALL_SIZES: ImageSize[] = ['xs', 'sm', 'md']
  */
 export const DEFAULT_TYPE_PREFIXES = {
   avatar: 'avatars',
-  header: 'headers',
-  token: 'tokens',
-  contract: 'contracts',
 } as const
 
 export type DefaultImageType = keyof typeof DEFAULT_TYPE_PREFIXES

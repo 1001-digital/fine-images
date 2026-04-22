@@ -72,7 +72,7 @@ The published Lucid model is a regular model. If you want to add a relation, ext
 import BaseImageCache from '@1001-digital/fine-images/models/image_cache'
 import { belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import User from '#models/user'
+import Asset from '#models/asset'
 
 export default class ImageCache extends BaseImageCache {
   @belongsTo(() => Asset, { foreignKey: 'cid' })

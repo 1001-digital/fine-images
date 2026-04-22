@@ -14,7 +14,7 @@ import {
 type Disk = ReturnType<DriveService['use']>
 
 function versionKey(baseKey: string, size: ImageSize) {
-  return `${baseKey}_${size}.webp`
+  return `${baseKey}@${size}.webp`
 }
 
 function bestAvailableSize(
@@ -52,7 +52,7 @@ export class FineImagesService {
 
   /**
    * Resize `content` into all variants smaller than the source, write each to
-   * the disk at `<scopePrefix>/<key>_<size>.webp`, upsert the tracking row,
+   * the disk at `<scopePrefix>/<key>@<size>.webp`, upsert the tracking row,
    * and fire-and-forget a CDN purge. Returns the base key so callers can
    * construct URLs offline if they like.
    */

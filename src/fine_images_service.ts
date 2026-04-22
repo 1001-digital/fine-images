@@ -1,4 +1,5 @@
 import type { DriveService } from '@adonisjs/drive/types'
+import { KeyNormalizer } from 'flydrive'
 import ImageCache from './models/image_cache.js'
 import {
   resizeImage,
@@ -12,6 +13,8 @@ import {
 } from './types.js'
 
 type Disk = ReturnType<DriveService['use']>
+
+KeyNormalizer.allowedCharacterSet = /^[A-Za-z0-9-_!/@\.\s]*$/
 
 function versionKey(baseKey: string, size: ImageSize) {
   return `${baseKey}@${size}.webp`

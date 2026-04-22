@@ -1,5 +1,13 @@
 # @1001-digital/fine-images
 
+## 0.4.0
+
+### Minor Changes
+
+- [#4](https://github.com/1001-digital/fine-images/pull/4) [`16e1ba0`](https://github.com/1001-digital/fine-images/commit/16e1ba01a4e09603904af30eb8b1d27b3e2d8bde) Thanks [@yougogirldoteth](https://github.com/yougogirldoteth)! - Rename image cache identity fields to `key` and `scope`.
+
+  This is a breaking change for existing installations. Before upgrading, add an app migration that renames the image identity column to `key`, the logical bucket/type column to `scope`, and enforces a unique `(key, scope)` constraint. Update custom callers or Lucid relations to use the new names.
+
 ## 0.3.0
 
 ### Minor Changes

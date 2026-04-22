@@ -1,14 +1,15 @@
 import type { DriveDisks } from '@adonisjs/drive/types'
 
-export type ImageSize = 'xs' | 'sm' | 'md'
+export type ImageSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export const IMAGE_WIDTHS: Record<ImageSize, number> = {
   xs: 150,
   sm: 400,
   md: 800,
+  lg: 1200,
 }
 
-export const ALL_SIZES: ImageSize[] = ['xs', 'sm', 'md']
+export const ALL_SIZES: ImageSize[] = ['xs', 'sm', 'md', 'lg']
 
 /**
  * Built-in image types. Consumers can pass any string — these are the
@@ -59,7 +60,7 @@ export interface ResizedImage {
 
 /**
  * Row shape stored in `image_caches`. Keyed on `(scope, type)`; `versions`
- * is a jsonb map `{ xs: true, sm: true, md: false }`.
+ * is a jsonb map `{ xs: true, sm: true, md: false, lg: false }`.
  */
 export interface FineImageRow {
   scope: string

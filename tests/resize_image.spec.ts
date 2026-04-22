@@ -23,11 +23,11 @@ async function widthOf(buf: Buffer): Promise<number> {
 
 test.group('resizeImage', () => {
   test('emits every size strictly smaller than the source', async ({ assert }) => {
-    const source = await pngOfWidth(1000)
+    const source = await pngOfWidth(1400)
     const results = await resizeImage(source)
 
     const sizes = results.map((r) => r.size).sort()
-    assert.deepEqual(sizes, ['md', 'sm', 'xs'])
+    assert.deepEqual(sizes, ['lg', 'md', 'sm', 'xs'])
 
     for (const r of results) {
       const w = await widthOf(r.buffer)
@@ -36,7 +36,7 @@ test.group('resizeImage', () => {
   })
 
   test('skips sizes >= source width', async ({ assert }) => {
-    // Source is 500px: xs (150) and sm (400) qualify, md (800) does not.
+    // Source is 500px: xs (150) and sm (400) qualify, md (800) and lg (1200) do not.
     const source = await pngOfWidth(500)
     const results = await resizeImage(source)
 
@@ -67,7 +67,8 @@ test.group('resizeImage', () => {
 
   test('rasterises svg and emits sizes below the rasterised width', async ({ assert }) => {
     // Tiny intrinsic SVG — resizer raises density so the rasterised width hits
-    // the largest target (md=800). Strict > means md itself is skipped; sm + xs
+    // the largest target (lg=1200). Strict > means lg itself is skipped; md,
+    // sm, and xs
     // still emit.
     const svg = Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
@@ -77,15 +78,15 @@ test.group('resizeImage', () => {
 
     const results = await resizeImage(svg)
     const sizes = results.map((r) => r.size).sort()
-    assert.includeMembers(sizes, ['sm', 'xs'])
+    assert.includeMembers(sizes, ['md', 'sm', 'xs'])
     const sm = results.find((r) => r.size === 'sm')!
     assert.equal(await widthOf(sm.buffer), IMAGE_WIDTHS.sm as number)
   })
 
   test('preserves the ImageSize type contract', async ({ assert }) => {
-    const source = await pngOfWidth(1000)
+    const source = await pngOfWidth(1400)
     const results = await resizeImage(source)
-    const allowed: ImageSize[] = ['xs', 'sm', 'md']
+    const allowed: ImageSize[] = ['xs', 'sm', 'md', 'lg']
     for (const r of results) {
       assert.include(allowed, r.size)
     }

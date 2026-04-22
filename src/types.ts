@@ -12,14 +12,14 @@ export const IMAGE_WIDTHS: Record<ImageSize, number> = {
 export const ALL_SIZES: ImageSize[] = ['xs', 'sm', 'md', 'lg']
 
 /**
- * Built-in image types. Consumers can pass any string — these are the
+ * Built-in image scopes. Consumers can pass any string — these are the
  * conventions we ship preset key prefixes for.
  */
-export const DEFAULT_TYPE_PREFIXES = {
+export const DEFAULT_SCOPE_PREFIXES = {
   avatar: 'avatars',
 } as const
 
-export type DefaultImageType = keyof typeof DEFAULT_TYPE_PREFIXES
+export type DefaultImageScope = keyof typeof DEFAULT_SCOPE_PREFIXES
 
 export interface FineImagesConfig {
   /**
@@ -29,13 +29,13 @@ export interface FineImagesConfig {
   disk?: keyof DriveDisks
 
   /**
-   * Map from logical image type to the key prefix used inside the disk. Merged
-   * on top of {@link DEFAULT_TYPE_PREFIXES}, so consumers only need to list
-   * additional types they care about.
+   * Map from logical image scope to the key prefix used inside the disk. Merged
+   * on top of {@link DEFAULT_SCOPE_PREFIXES}, so consumers only need to list
+   * additional scopes they care about.
    *
-   * Example: `{ collection: 'collections' }` to add a new type.
+   * Example: `{ collection: 'collections' }` to add a new scope.
    */
-  typePrefixes?: Record<string, string>
+  scopePrefixes?: Record<string, string>
 
   /**
    * CDN origin used to build file URLs passed to Cloudflare's purge API.
@@ -59,11 +59,11 @@ export interface ResizedImage {
 }
 
 /**
- * Row shape stored in `image_caches`. Keyed on `(scope, type)`; `versions`
+ * Row shape stored in `image_caches`. Keyed on `(key, scope)`; `versions`
  * is a jsonb map `{ xs: true, sm: true, md: false, lg: false }`.
  */
 export interface FineImageRow {
+  key: string
   scope: string
-  type: string
   versions: Record<string, boolean>
 }

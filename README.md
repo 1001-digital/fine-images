@@ -26,17 +26,16 @@ The `configure` step:
 ```ts
 import fineImages from '@1001-digital/fine-images/services/main'
 
-// Store variants keyed on (type, scope). `type` is a free-form string; a few
-// prefixes are built-in (avatar, header, token, contract) and can be extended
-// via config.typePrefixes.
-await fineImages.put('avatar', userAddress, buffer)
+// Store variants keyed on (scope, key). `scope` is a free-form bucket name;
+// a few prefixes are built-in and can be extended via config.scopePrefixes.
+await fineImages.put('avatar', profileAddress, buffer)
 
-const url = await fineImages.getUrl('avatar', userAddress, 'sm')
+const url = await fineImages.getUrl('avatar', profileAddress, 'sm')
 
-// Batch fetch avatar URLs for a list of scopes — handy for lists.
-const urls = await fineImages.batchGetAvatarUrls(addresses)
+// Batch fetch URLs for a scope and list of keys — handy for lists.
+const urls = await fineImages.batchGetUrlsByScope('avatar', profileAddresses)
 
-await fineImages.delete('avatar', userAddress)
+await fineImages.delete('avatar', profileAddress)
 ```
 
 The service takes a `Disk` in construction, so it works with whichever Drive disk is configured as default (or named via `config.disk`). Nothing in here is S3-specific.
@@ -51,7 +50,7 @@ import { defineConfig } from '@1001-digital/fine-images'
 
 export default defineConfig({
   disk: 'r2',
-  typePrefixes: {
+  scopePrefixes: {
     collection: 'collections',
   },
   cdnUrl: env.get('R2_CDN_URL'),
@@ -72,11 +71,11 @@ The published Lucid model is a regular model. If you want to add a relation, ext
 import BaseImageCache from '@1001-digital/fine-images/models/image_cache'
 import { belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import User from '#models/user'
+import Asset from '#models/asset'
 
 export default class ImageCache extends BaseImageCache {
-  @belongsTo(() => User, { foreignKey: 'scope' })
-  declare user: BelongsTo<typeof User>
+  @belongsTo(() => Asset, { foreignKey: 'key' })
+  declare asset: BelongsTo<typeof Asset>
 }
 ```
 

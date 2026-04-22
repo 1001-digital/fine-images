@@ -52,16 +52,16 @@ export class FineImagesService {
 
   /**
    * Resize `content` into all variants smaller than the source, write each to
-   * the disk at `<typePrefix>/<scope>_<size>.webp`, upsert the tracking row,
+   * the disk at `<typePrefix>/<cid>_<size>.webp`, upsert the tracking row,
    * and fire-and-forget a CDN purge. Returns the base key so callers can
    * construct URLs offline if they like.
    */
   async put(
     type: string,
-    scope: string,
+    cid: string,
     content: Buffer | Uint8Array,
   ): Promise<string> {
-    const baseKey = this.#baseKey(type, scope)
+    const baseKey = this.#baseKey(type, cid)
     const resized = await resizeImage(content)
 
     await Promise.all(
@@ -75,7 +75,7 @@ export class FineImagesService {
     const versions: Record<string, boolean> = {}
     for (const img of resized) versions[img.size] = true
 
-    await ImageCache.updateOrCreate({ scope, type }, { scope, type, versions })
+    await ImageCache.updateOrCreate({ cid, type }, { cid, type, versions })
 
     this.#purgeCache(baseKey)
     return baseKey
@@ -83,26 +83,26 @@ export class FineImagesService {
 
   async getUrl(
     type: string,
-    scope: string,
+    cid: string,
     size: ImageSize = 'sm',
   ): Promise<string | undefined> {
-    const row = await ImageCache.query().where({ scope, type }).first()
+    const row = await ImageCache.query().where({ cid, type }).first()
     if (!row) return undefined
-    const baseKey = this.#baseKey(type, scope)
+    const baseKey = this.#baseKey(type, cid)
     return this.#disk.getUrl(
       versionKey(baseKey, bestAvailableSize(size, row.versions)),
     )
   }
 
   /**
-   * For a given `scope`, fetch URLs for its `avatar` + `header` rows (if any)
+   * For a given `cid`, fetch URLs for its `avatar` + `header` rows (if any)
    * in one query. Convenience for profile pages where you want both in one
    * shot. Consumers with more types can query directly.
    */
   async getImageUrls(
-    scope: string,
+    cid: string,
   ): Promise<{ avatar?: string; header?: string }> {
-    const rows = await ImageCache.query().where('scope', scope)
+    const rows = await ImageCache.query().where('cid', cid)
     const out: { avatar?: string; header?: string } = {}
 
     const entries = rows
@@ -111,7 +111,7 @@ export class FineImagesService {
           row.type === 'avatar' || row.type === 'header',
       )
       .map((row) => {
-        const baseKey = this.#baseKey(row.type, scope)
+        const baseKey = this.#baseKey(row.type, cid)
         const preferred: ImageSize = row.type === 'avatar' ? 'sm' : 'md'
         return {
           type: row.type,
@@ -128,16 +128,16 @@ export class FineImagesService {
     return out
   }
 
-  async batchGetAvatarUrls(scopes: string[]): Promise<Record<string, string>> {
-    if (!scopes.length) return {}
+  async batchGetAvatarUrls(cids: string[]): Promise<Record<string, string>> {
+    if (!cids.length) return {}
 
     const rows = await ImageCache.query()
-      .whereIn('scope', scopes)
+      .whereIn('cid', cids)
       .where('type', 'avatar')
     const entries = rows.map((row) => {
-      const baseKey = this.#baseKey('avatar', row.scope)
+      const baseKey = this.#baseKey('avatar', row.cid)
       return {
-        scope: row.scope,
+        cid: row.cid,
         url: this.#disk.getUrl(
           versionKey(baseKey, bestAvailableSize('sm', row.versions)),
         ),
@@ -147,7 +147,7 @@ export class FineImagesService {
 
     const out: Record<string, string> = {}
     entries.forEach((e, i) => {
-      out[e.scope] = urls[i]
+      out[e.cid] = urls[i]
     })
     return out
   }
@@ -156,14 +156,14 @@ export class FineImagesService {
    * Remove every variant on disk + the tracking row + purge CDN. Does not
    * error if the row doesn't exist — idempotent.
    */
-  async delete(type: string, scope: string): Promise<void> {
-    const baseKey = this.#baseKey(type, scope)
+  async delete(type: string, cid: string): Promise<void> {
+    const baseKey = this.#baseKey(type, cid)
     await Promise.all(
       ALL_SIZES.map((s) =>
         this.#disk.delete(versionKey(baseKey, s)).catch(() => {}),
       ),
     )
-    await ImageCache.query().where({ scope, type }).delete()
+    await ImageCache.query().where({ cid, type }).delete()
     this.#purgeCache(baseKey)
   }
 
@@ -171,16 +171,14 @@ export class FineImagesService {
    * Read-only: lookup raw versions map without touching the disk. Useful for
    * batch rendering where the caller already knows the base URL pattern.
    */
-  async getRow(type: string, scope: string): Promise<FineImageRow | null> {
-    const row = await ImageCache.query().where({ scope, type }).first()
-    return row
-      ? { scope: row.scope, type: row.type, versions: row.versions }
-      : null
+  async getRow(type: string, cid: string): Promise<FineImageRow | null> {
+    const row = await ImageCache.query().where({ cid, type }).first()
+    return row ? { cid: row.cid, type: row.type, versions: row.versions } : null
   }
 
-  #baseKey(type: string, scope: string): string {
+  #baseKey(type: string, cid: string): string {
     const prefix = this.#prefixes[type] ?? type
-    return `${prefix}/${scope}`
+    return `${prefix}/${cid}`
   }
 
   #purgeCache(baseKey: string): void {

@@ -7,15 +7,15 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
  *
  *   import BaseImageCache from '@1001-digital/fine-images/models/image_cache'
  *   export default class ImageCache extends BaseImageCache {
- *     @belongsTo(() => User, { foreignKey: 'scope' })
- *     declare user: BelongsTo<typeof User>
+ *     @belongsTo(() => Asset, { foreignKey: 'cid' })
+ *     declare asset: BelongsTo<typeof Asset>
  *   }
  */
 export default class ImageCache extends BaseModel {
   static table = 'image_caches'
 
   @column({ isPrimary: true })
-  declare scope: string
+  declare cid: string
 
   @column({ isPrimary: true })
   declare type: string

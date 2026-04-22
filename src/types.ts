@@ -59,11 +59,11 @@ export interface ResizedImage {
 }
 
 /**
- * Row shape stored in `image_caches`. Keyed on `(scope, type)`; `versions`
+ * Row shape stored in `image_caches`. Keyed on `(cid, type)`; `versions`
  * is a jsonb map `{ xs: true, sm: true, md: false, lg: false }`.
  */
 export interface FineImageRow {
-  scope: string
+  cid: string
   type: string
   versions: Record<string, boolean>
 }

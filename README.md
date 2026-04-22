@@ -2,7 +2,7 @@
 
 Image caching + resizing for AdonisJS v7.
 
-Takes a source image buffer, resizes it to a set of webp variants (`xs`, `sm`, `md`), stores them on any configured [Drive](https://docs.adonisjs.com/guides/drive) disk (R2, S3, local, …), tracks what variants exist in the `image_caches` table, and — optionally — purges the files from Cloudflare's edge cache when they change.
+Takes a source image buffer, resizes it to a set of webp variants (`xs`, `sm`, `md`, `lg`), stores them on any configured [Drive](https://docs.adonisjs.com/guides/drive) disk (R2, S3, local, …), tracks what variants exist in the `image_caches` table, and — optionally — purges the files from Cloudflare's edge cache when they change.
 
 Extracted from internal use by [evm.now](https://evm.now) and [networked.art](https://networked.art) so both consume the same implementation.
 
@@ -90,7 +90,7 @@ If you want the sharp toolchain without the caching service (e.g. one-off CLI wo
 import { resizeImage } from '@1001-digital/fine-images/services/image_resizer'
 
 const variants = await resizeImage(buffer)
-// → [{ size: 'xs', buffer }, { size: 'sm', buffer }, { size: 'md', buffer }]
+// → [{ size: 'xs', buffer }, { size: 'sm', buffer }, { size: 'md', buffer }, { size: 'lg', buffer }]
 ```
 
 ## Peer dependencies

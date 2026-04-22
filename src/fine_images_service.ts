@@ -152,18 +152,22 @@ export class FineImagesService {
     return out
   }
 
-  async batchGetAvatarUrls(keys: string[]): Promise<Record<string, string>> {
+  async batchGetUrlsByScope(
+    scope: string,
+    keys: string[],
+    size: ImageSize = 'sm',
+  ): Promise<Record<string, string>> {
     if (!keys.length) return {}
 
     const rows = await ImageCache.query()
       .whereIn('key', keys)
-      .where('scope', 'avatar')
+      .where('scope', scope)
     const entries = rows.map((row) => {
-      const baseKey = this.#baseKey('avatar', row.key)
+      const baseKey = this.#baseKey(scope, row.key)
       return {
         key: row.key,
         url: this.#disk.getUrl(
-          versionKey(baseKey, bestAvailableSize('sm', row.versions)),
+          versionKey(baseKey, bestAvailableSize(size, row.versions)),
         ),
       }
     })

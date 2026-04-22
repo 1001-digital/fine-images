@@ -32,8 +32,8 @@ await fineImages.put('avatar', profileAddress, buffer)
 
 const url = await fineImages.getUrl('avatar', profileAddress, 'sm')
 
-// Batch fetch avatar URLs for a list of keys — handy for lists.
-const urls = await fineImages.batchGetAvatarUrls(profileAddresses)
+// Batch fetch URLs for a scope and list of keys — handy for lists.
+const urls = await fineImages.batchGetUrlsByScope('avatar', profileAddresses)
 
 await fineImages.delete('avatar', profileAddress)
 ```

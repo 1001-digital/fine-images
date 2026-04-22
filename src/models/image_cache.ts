@@ -15,9 +15,12 @@ export default class ImageCache extends BaseModel {
   static table = 'image_caches'
 
   @column({ isPrimary: true })
+  declare id: number
+
+  @column()
   declare key: string
 
-  @column({ isPrimary: true })
+  @column()
   declare scope: string
 
   @column({

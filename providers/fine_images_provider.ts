@@ -31,10 +31,7 @@ export default class FineImagesProvider {
       ])
       const driveManager = driveManagerRaw as DriveService
 
-      const config = this.app.config.get<FineImagesConfig>(
-        'fine_images',
-        this.app.config.get<FineImagesConfig>('fineImages', {}),
-      )
+      const config = this.app.config.get<FineImagesConfig>('fine_images', {})
       const disk = config.disk
         ? driveManager.use(config.disk)
         : driveManager.use()

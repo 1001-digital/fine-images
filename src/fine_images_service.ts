@@ -25,6 +25,30 @@ function bestAvailableSize(
   return (ALL_SIZES.find((s) => versions?.[s]) ?? 'xs') as ImageSize
 }
 
+async function upsertImageCacheRow(
+  key: string,
+  scope: string,
+  versions: Record<string, boolean>,
+) {
+  const now = new Date()
+
+  await ImageCache.query()
+    .client.insertQuery()
+    .table(ImageCache.table)
+    .insert({
+      key,
+      scope,
+      versions,
+      created_at: now,
+      updated_at: now,
+    })
+    .onConflict(['key', 'scope'])
+    .merge({
+      versions,
+      updated_at: now,
+    })
+}
+
 export interface FineImagesServiceDeps {
   disk: Disk
   config: FineImagesConfig
@@ -75,7 +99,7 @@ export class FineImagesService {
     const versions: Record<string, boolean> = {}
     for (const img of resized) versions[img.size] = true
 
-    await ImageCache.updateOrCreate({ key, scope }, { key, scope, versions })
+    await upsertImageCacheRow(key, scope, versions)
 
     this.#purgeCache(baseKey)
     return baseKey

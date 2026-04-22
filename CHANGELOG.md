@@ -1,5 +1,11 @@
 # @1001-digital/fine-images
 
+## 0.3.0
+
+### Minor Changes
+
+- [#1](https://github.com/1001-digital/fine-images/pull/1) [`17e782c`](https://github.com/1001-digital/fine-images/commit/17e782caf8abfccc20ed8cf5b19d2ce0a05ba505) Thanks [@yougogirldoteth](https://github.com/yougogirldoteth)! - Add an `lg` image variant at 1200px for sources large enough to generate it.
+
 ## 0.2.0
 
 ### Minor Changes

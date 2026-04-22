@@ -14,8 +14,8 @@ export type {
   FineImagesConfig,
   ImageSize,
   ResizedImage,
-  DefaultImageType,
+  DefaultImageScope,
   FineImageRow,
 } from './src/types.js'
-export { ALL_SIZES, IMAGE_WIDTHS, DEFAULT_TYPE_PREFIXES } from './src/types.js'
+export { ALL_SIZES, IMAGE_WIDTHS, DEFAULT_SCOPE_PREFIXES } from './src/types.js'
 export type { FineImagesServiceDeps } from './src/fine_images_service.js'

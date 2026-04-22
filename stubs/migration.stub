@@ -8,15 +8,15 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.string('cid', 255).notNullable()
-      table.string('type', 50).notNullable()
+      table.string('key', 255).notNullable()
+      table.string('scope', 50).notNullable()
       table.jsonb('versions').notNullable().defaultTo('{}')
 
       table.timestamp('created_at', { useTz: true }).notNullable()
       table.timestamp('updated_at', { useTz: true }).notNullable()
 
-      table.primary(['cid', 'type'])
-      table.index(['cid'])
+      table.primary(['key', 'scope'])
+      table.index(['key'])
     })
   }
 

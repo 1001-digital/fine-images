@@ -26,17 +26,16 @@ The `configure` step:
 ```ts
 import fineImages from '@1001-digital/fine-images/services/main'
 
-// Store variants keyed on (type, cid). `type` is a free-form string; a few
-// prefixes are built-in (avatar, header, token, contract) and can be extended
-// via config.typePrefixes.
-await fineImages.put('avatar', imageCid, buffer)
+// Store variants keyed on (scope, key). `scope` is a free-form bucket name;
+// a few prefixes are built-in and can be extended via config.scopePrefixes.
+await fineImages.put('avatar', profileAddress, buffer)
 
-const url = await fineImages.getUrl('avatar', imageCid, 'sm')
+const url = await fineImages.getUrl('avatar', profileAddress, 'sm')
 
-// Batch fetch avatar URLs for a list of image CIDs — handy for lists.
-const urls = await fineImages.batchGetAvatarUrls(imageCids)
+// Batch fetch avatar URLs for a list of keys — handy for lists.
+const urls = await fineImages.batchGetAvatarUrls(profileAddresses)
 
-await fineImages.delete('avatar', imageCid)
+await fineImages.delete('avatar', profileAddress)
 ```
 
 The service takes a `Disk` in construction, so it works with whichever Drive disk is configured as default (or named via `config.disk`). Nothing in here is S3-specific.
@@ -51,7 +50,7 @@ import { defineConfig } from '@1001-digital/fine-images'
 
 export default defineConfig({
   disk: 'r2',
-  typePrefixes: {
+  scopePrefixes: {
     collection: 'collections',
   },
   cdnUrl: env.get('R2_CDN_URL'),
@@ -75,7 +74,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Asset from '#models/asset'
 
 export default class ImageCache extends BaseImageCache {
-  @belongsTo(() => Asset, { foreignKey: 'cid' })
+  @belongsTo(() => Asset, { foreignKey: 'key' })
   declare asset: BelongsTo<typeof Asset>
 }
 ```

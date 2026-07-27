@@ -1,5 +1,15 @@
 # @1001-digital/fine-images
 
+## 0.4.1
+
+### Patch Changes
+
+- [`d9db57d`](https://github.com/1001-digital/fine-images/commit/d9db57dfd56c1fcf17db9e2205950ffdefeb3df6) Thanks [@jwahdatehagh](https://github.com/jwahdatehagh)! - Auto-orient rasters from their EXIF orientation tag before resizing. Sharp
+  neither applies nor preserves the `Orientation` tag by default, so camera JPEGs
+  tagged 6/8 (portrait shot on a rotated sensor) were resized to sideways webp
+  variants while the untouched original still displayed upright. `resizeImage`
+  now calls `.rotate()` and gates size generation on the displayed width.
+
 ## 0.4.0
 
 ### Minor Changes

@@ -21,6 +21,24 @@ async function widthOf(buf: Buffer): Promise<number> {
   return meta.width ?? 0
 }
 
+async function jpegWithOrientation(
+  storedWidth: number,
+  storedHeight: number,
+  orientation: number
+): Promise<Buffer> {
+  return sharp({
+    create: {
+      width: storedWidth,
+      height: storedHeight,
+      channels: 3,
+      background: { r: 128, g: 64, b: 200 },
+    },
+  })
+    .withMetadata({ orientation })
+    .jpeg()
+    .toBuffer()
+}
+
 test.group('resizeImage', () => {
   test('emits every size strictly smaller than the source', async ({ assert }) => {
     const source = await pngOfWidth(1400)
@@ -79,6 +97,28 @@ test.group('resizeImage', () => {
     const results = await resizeImage(svg)
     const sizes = results.map((r) => r.size).sort()
     assert.includeMembers(sizes, ['md', 'sm', 'xs'])
+    const sm = results.find((r) => r.size === 'sm')!
+    assert.equal(await widthOf(sm.buffer), IMAGE_WIDTHS.sm as number)
+  })
+
+  test('auto-orients rasters carrying an EXIF orientation tag', async ({ assert }) => {
+    // Stored landscape 1400x700 tagged orientation=6 (rotate 90° CW to display),
+    // i.e. displayed portrait 700x1400 — the camera-JPEG case that came out sideways.
+    const source = await jpegWithOrientation(1400, 700, 6)
+    const results = await resizeImage(source)
+
+    // Size gating uses the *displayed* width (700): only xs (150) and sm (400) qualify.
+    const sizes = results.map((r) => r.size).sort()
+    assert.deepEqual(sizes, ['sm', 'xs'])
+
+    for (const r of results) {
+      const meta = await sharp(r.buffer).metadata()
+      // Upright portrait, not the sideways stored pixels...
+      assert.isAbove(meta.height ?? 0, meta.width ?? 0)
+      // ...and no residual orientation tag to double-rotate downstream.
+      assert.isUndefined(meta.orientation)
+    }
+
     const sm = results.find((r) => r.size === 'sm')!
     assert.equal(await widthOf(sm.buffer), IMAGE_WIDTHS.sm as number)
   })

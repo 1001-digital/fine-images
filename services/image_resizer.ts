@@ -22,11 +22,17 @@ const MAX_RASTER_PIXELS = 4096 * 4096
  * SVGs are rasterised at a density that produces our largest configured
  * width, capped at {@link MAX_RASTER_PIXELS} so a pathological viewBox
  * doesn't blow up memory.
+ *
+ * `.rotate()` (no args) auto-orients rasters from their EXIF orientation tag
+ * and drops the tag from the output. Without it, Sharp writes the stored
+ * pixels verbatim and strips the tag, so a camera JPEG carrying an
+ * `Orientation` of 6/8 comes out sideways. It is a no-op for inputs with no
+ * orientation metadata (SVGs, generated images).
  */
 export async function resizeImage(
   input: Buffer | Uint8Array,
 ): Promise<ResizedImage[]> {
-  let image = sharp(input)
+  let image = sharp(input).rotate()
   let metadata = await image.metadata()
 
   if (
@@ -45,11 +51,15 @@ export async function resizeImage(
       density = Math.floor(Math.sqrt(MAX_RASTER_PIXELS / (w * h)) * baseDpi)
     }
 
-    image = sharp(input, { density })
+    image = sharp(input, { density }).rotate()
     metadata = await image.metadata()
   }
 
-  const sourceWidth = metadata.width || 0
+  // `metadata()` reports the stored (pre-rotation) dimensions, so for images
+  // the EXIF orientation turns on its side (orientation >= 5) the displayed
+  // width is the stored height. Gate size generation on the displayed width.
+  const rotated = (metadata.orientation ?? 1) >= 5
+  const sourceWidth = (rotated ? metadata.height : metadata.width) || 0
   const results: ResizedImage[] = []
 
   for (const [size, width] of Object.entries(IMAGE_WIDTHS) as [

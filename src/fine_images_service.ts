@@ -4,6 +4,7 @@ import {
   resizeImage,
   ALL_SIZES,
   type ImageSize,
+  type ResizeImageOptions,
 } from '../services/image_resizer.js'
 import {
   DEFAULT_SCOPE_PREFIXES,
@@ -84,9 +85,10 @@ export class FineImagesService {
     scope: string,
     key: string,
     content: Buffer | Uint8Array,
+    options: ResizeImageOptions = {},
   ): Promise<string> {
     const baseKey = this.#baseKey(scope, key)
-    const resized = await resizeImage(content)
+    const resized = await resizeImage(content, options)
 
     await Promise.all(
       resized.map((img) =>
@@ -201,7 +203,9 @@ export class FineImagesService {
    */
   async getRow(scope: string, key: string): Promise<FineImageRow | null> {
     const row = await ImageCache.query().where({ key, scope }).first()
-    return row ? { key: row.key, scope: row.scope, versions: row.versions } : null
+    return row
+      ? { key: row.key, scope: row.scope, versions: row.versions }
+      : null
   }
 
   #baseKey(scope: string, key: string): string {

@@ -30,6 +30,9 @@ import fineImages from '@1001-digital/fine-images/services/main'
 // a few prefixes are built-in and can be extended via config.scopePrefixes.
 await fineImages.put('avatar', profileAddress, buffer)
 
+// Preserve hard-edged graphics without lossy WebP colour bleed.
+await fineImages.put('token', tokenKey, renderedSvgPng, { lossless: true })
+
 const url = await fineImages.getUrl('avatar', profileAddress, 'sm')
 
 // Batch fetch URLs for a scope and list of keys — handy for lists.
@@ -90,6 +93,10 @@ import { resizeImage } from '@1001-digital/fine-images/services/image_resizer'
 
 const variants = await resizeImage(buffer)
 // → [{ size: 'xs', buffer }, { size: 'sm', buffer }, { size: 'md', buffer }, { size: 'lg', buffer }]
+
+const losslessVariants = await resizeImage(renderedSvgPng, {
+  lossless: true,
+})
 ```
 
 ## Peer dependencies

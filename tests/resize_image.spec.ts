@@ -24,7 +24,7 @@ async function widthOf(buf: Buffer): Promise<number> {
 async function jpegWithOrientation(
   storedWidth: number,
   storedHeight: number,
-  orientation: number
+  orientation: number,
 ): Promise<Buffer> {
   return sharp({
     create: {
@@ -40,7 +40,9 @@ async function jpegWithOrientation(
 }
 
 test.group('resizeImage', () => {
-  test('emits every size strictly smaller than the source', async ({ assert }) => {
+  test('emits every size strictly smaller than the source', async ({
+    assert,
+  }) => {
     const source = await pngOfWidth(1400)
     const results = await resizeImage(source)
 
@@ -62,7 +64,9 @@ test.group('resizeImage', () => {
     assert.deepEqual(sizes, ['sm', 'xs'])
   })
 
-  test('falls back to xs when source is smaller than every target', async ({ assert }) => {
+  test('falls back to xs when source is smaller than every target', async ({
+    assert,
+  }) => {
     const source = await pngOfWidth(100)
     const results = await resizeImage(source)
 
@@ -83,7 +87,16 @@ test.group('resizeImage', () => {
     }
   })
 
-  test('rasterises svg and emits sizes below the rasterised width', async ({ assert }) => {
+  test('encodes lossless webp when requested', async ({ assert }) => {
+    const source = await pngOfWidth(100)
+    const [result] = await resizeImage(source, { lossless: true })
+
+    assert.equal(result.buffer.toString('ascii', 12, 16), 'VP8L')
+  })
+
+  test('rasterises svg and emits sizes below the rasterised width', async ({
+    assert,
+  }) => {
     // Tiny intrinsic SVG — resizer raises density so the rasterised width hits
     // the largest target (lg=1200). Strict > means lg itself is skipped; md,
     // sm, and xs
@@ -91,7 +104,7 @@ test.group('resizeImage', () => {
     const svg = Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
          <rect width="50" height="50" fill="red"/>
-       </svg>`
+       </svg>`,
     )
 
     const results = await resizeImage(svg)
@@ -101,7 +114,9 @@ test.group('resizeImage', () => {
     assert.equal(await widthOf(sm.buffer), IMAGE_WIDTHS.sm as number)
   })
 
-  test('auto-orients rasters carrying an EXIF orientation tag', async ({ assert }) => {
+  test('auto-orients rasters carrying an EXIF orientation tag', async ({
+    assert,
+  }) => {
     // Stored landscape 1400x700 tagged orientation=6 (rotate 90° CW to display),
     // i.e. displayed portrait 700x1400 — the camera-JPEG case that came out sideways.
     const source = await jpegWithOrientation(1400, 700, 6)

@@ -9,6 +9,14 @@ import {
 export { ALL_SIZES, IMAGE_WIDTHS }
 export type { ImageSize, ResizedImage }
 
+export interface ResizeImageOptions {
+  /**
+   * Encode WebP variants losslessly. Useful for rendered SVGs and other
+   * graphics where lossy chroma subsampling visibly softens hard edges.
+   */
+  lossless?: boolean
+}
+
 const MAX_OUTPUT_WIDTH = Math.max(...Object.values(IMAGE_WIDTHS))
 const DEFAULT_SVG_DPI = 72
 const DEFAULT_SVG_INTRINSIC_WIDTH = 200
@@ -31,6 +39,7 @@ const MAX_RASTER_PIXELS = 4096 * 4096
  */
 export async function resizeImage(
   input: Buffer | Uint8Array,
+  options: ResizeImageOptions = {},
 ): Promise<ResizedImage[]> {
   let image = sharp(input).rotate()
   let metadata = await image.metadata()
@@ -60,6 +69,7 @@ export async function resizeImage(
   // width is the stored height. Gate size generation on the displayed width.
   const rotated = (metadata.orientation ?? 1) >= 5
   const sourceWidth = (rotated ? metadata.height : metadata.width) || 0
+  const webpOptions = options.lossless ? { lossless: true } : {}
   const results: ResizedImage[] = []
 
   for (const [size, width] of Object.entries(IMAGE_WIDTHS) as [
@@ -69,7 +79,11 @@ export async function resizeImage(
     if (sourceWidth > width) {
       results.push({
         size,
-        buffer: await image.clone().resize({ width }).webp().toBuffer(),
+        buffer: await image
+          .clone()
+          .resize({ width })
+          .webp(webpOptions)
+          .toBuffer(),
       })
     }
   }
@@ -77,7 +91,7 @@ export async function resizeImage(
   if (results.length === 0) {
     results.push({
       size: 'xs',
-      buffer: await image.clone().webp().toBuffer(),
+      buffer: await image.clone().webp(webpOptions).toBuffer(),
     })
   }
 

@@ -1,5 +1,13 @@
 # @1001-digital/fine-images
 
+## 0.5.0
+
+### Minor Changes
+
+- [`fbb659b`](https://github.com/1001-digital/fine-images/commit/fbb659b1e418d0665ae6e0bb4c0539857f082c42) Thanks [@jwahdatehagh](https://github.com/jwahdatehagh)! - Allow `resizeImage` and `fineImages.put` callers to request lossless WebP
+  variants. This preserves hard edges and exact colours in rendered SVG artwork
+  while leaving the existing lossy encoding as the default for photographs.
+
 ## 0.4.1
 
 ### Patch Changes

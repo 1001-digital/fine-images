@@ -94,6 +94,31 @@ test.group('resizeImage', () => {
     assert.equal(result.buffer.toString('ascii', 12, 16), 'VP8L')
   })
 
+  test('accepts a bounded input pixel limit', async ({ assert }) => {
+    const source = await pngOfWidth(100, 100)
+
+    await assert.rejects(
+      () => resizeImage(source, { limitInputPixels: 9_999 }),
+      /Input image exceeds pixel limit/,
+    )
+
+    const [result] = await resizeImage(source, {
+      limitInputPixels: 10_000,
+    })
+    assert.equal(await widthOf(result.buffer), 100)
+  })
+
+  test('does not allow callers to remove the input pixel limit', async ({
+    assert,
+  }) => {
+    const source = await pngOfWidth(100, 100)
+
+    await assert.rejects(
+      () => resizeImage(source, { limitInputPixels: 0 }),
+      /limitInputPixels must be a positive safe integer/,
+    )
+  })
+
   test('rasterises svg and emits sizes below the rasterised width', async ({
     assert,
   }) => {

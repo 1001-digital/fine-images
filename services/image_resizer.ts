@@ -15,6 +15,12 @@ export interface ResizeImageOptions {
    * graphics where lossy chroma subsampling visibly softens hard edges.
    */
   lossless?: boolean
+  /**
+   * Reject inputs whose encoded dimensions exceed this many pixels. Defaults
+   * to Sharp's own safety limit. Must be a positive safe integer so callers
+   * cannot accidentally disable protection for untrusted images.
+   */
+  limitInputPixels?: number
 }
 
 const MAX_OUTPUT_WIDTH = Math.max(...Object.values(IMAGE_WIDTHS))
@@ -41,7 +47,8 @@ export async function resizeImage(
   input: Buffer | Uint8Array,
   options: ResizeImageOptions = {},
 ): Promise<ResizedImage[]> {
-  let image = sharp(input).rotate()
+  const inputOptions = sharpInputOptions(options)
+  let image = sharp(input, inputOptions).rotate()
   let metadata = await image.metadata()
 
   if (
@@ -60,7 +67,7 @@ export async function resizeImage(
       density = Math.floor(Math.sqrt(MAX_RASTER_PIXELS / (w * h)) * baseDpi)
     }
 
-    image = sharp(input, { density }).rotate()
+    image = sharp(input, { ...inputOptions, density }).rotate()
     metadata = await image.metadata()
   }
 
@@ -96,4 +103,15 @@ export async function resizeImage(
   }
 
   return results
+}
+
+function sharpInputOptions(options: ResizeImageOptions) {
+  if (options.limitInputPixels === undefined) return {}
+  if (
+    !Number.isSafeInteger(options.limitInputPixels) ||
+    options.limitInputPixels <= 0
+  ) {
+    throw new TypeError('limitInputPixels must be a positive safe integer')
+  }
+  return { limitInputPixels: options.limitInputPixels }
 }

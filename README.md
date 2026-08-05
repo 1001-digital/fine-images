@@ -33,6 +33,12 @@ await fineImages.put('avatar', profileAddress, buffer)
 // Preserve hard-edged graphics without lossy WebP colour bleed.
 await fineImages.put('token', tokenKey, renderedSvgPng, { lossless: true })
 
+// Raise Sharp's input-pixel guard for a trusted, bounded processing path.
+// The option must be a positive integer; it cannot disable the safety limit.
+await fineImages.put('token', tokenKey, unusuallyLargeRaster, {
+  limitInputPixels: 300_000_000,
+})
+
 const url = await fineImages.getUrl('avatar', profileAddress, 'sm')
 
 // Batch fetch URLs for a scope and list of keys — handy for lists.
@@ -96,6 +102,10 @@ const variants = await resizeImage(buffer)
 
 const losslessVariants = await resizeImage(renderedSvgPng, {
   lossless: true,
+})
+
+const largeRasterVariants = await resizeImage(unusuallyLargeRaster, {
+  limitInputPixels: 300_000_000,
 })
 ```
 

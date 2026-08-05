@@ -1,5 +1,13 @@
 # @1001-digital/fine-images
 
+## 0.6.0
+
+### Minor Changes
+
+- [#8](https://github.com/1001-digital/fine-images/pull/8) [`25f38ac`](https://github.com/1001-digital/fine-images/commit/25f38acbb705020530dd8154b35cdac95fdfae89) Thanks [@jwahdatehagh](https://github.com/jwahdatehagh)! - Allow `resizeImage` and `fineImages.put` callers to raise Sharp's input pixel
+  limit to a positive, bounded value without exposing the option to disable the
+  safety guard for untrusted images.
+
 ## 0.5.0
 
 ### Minor Changes
